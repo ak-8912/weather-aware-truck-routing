@@ -3,7 +3,27 @@ from unittest.mock import patch
 
 from django.core.exceptions import ImproperlyConfigured
 
-from config.settings import database_config
+from config.settings import configured_allowed_hosts, database_config
+
+
+class AllowedHostSettingsTests(TestCase):
+    def test_render_service_hostname_is_added_automatically(self):
+        self.assertEqual(configured_allowed_hosts(
+            debug=False,
+            configured_hosts="weather-aware-truck-routing-p24r.onrender.com",
+            render_hostname="weather-aware-truck-routing-p24r.onrender.com",
+        ), ["weather-aware-truck-routing-p24r.onrender.com"])
+
+    def test_render_hostname_is_added_when_manual_host_is_missing(self):
+        self.assertEqual(configured_allowed_hosts(
+            debug=False,
+            configured_hosts="",
+            render_hostname="weather-aware-truck-routing-p24r.onrender.com",
+        ), ["weather-aware-truck-routing-p24r.onrender.com"])
+
+    def test_localhost_defaults_remain_for_debug(self):
+        with patch.dict("os.environ", {"DJANGO_ALLOWED_HOSTS": "localhost,127.0.0.1", "RENDER_EXTERNAL_HOSTNAME": ""}, clear=True):
+            self.assertEqual(configured_allowed_hosts(debug=True), ["localhost", "127.0.0.1"])
 
 
 class DatabaseSettingsTests(TestCase):

@@ -34,9 +34,20 @@ if not DEBUG and (not SECRET_KEY or SECRET_KEY.casefold() in {
 }):
     raise ImproperlyConfigured("Set DJANGO_SECRET_KEY to a unique secret when DJANGO_DEBUG is False.")
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv(
-    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else ""
-).split(",") if host.strip()]
+def configured_allowed_hosts(debug: bool, configured_hosts: str | None = None, render_hostname: str | None = None) -> list[str]:
+    if configured_hosts is None:
+        configured_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if debug else "")
+    if render_hostname is None:
+        render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
+
+    hosts = [host.strip() for host in configured_hosts.split(",") if host.strip()]
+    render_hostname = render_hostname.strip()
+    if render_hostname:
+        hosts.append(render_hostname)
+    return list(dict.fromkeys(hosts))
+
+
+ALLOWED_HOSTS = configured_allowed_hosts(DEBUG)
 if not DEBUG and (not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS):
     raise ImproperlyConfigured("Set DJANGO_ALLOWED_HOSTS to explicit production hostnames.")
 
