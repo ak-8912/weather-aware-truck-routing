@@ -29,6 +29,9 @@ REST_FRAMEWORK = {
 OPENROUTESERVICE_BASE_URL = os.getenv("OPENROUTESERVICE_BASE_URL", "https://api.heigit.org/openrouteservice").rstrip("/")
 OPENROUTESERVICE_GEOCODING_BASE_URL = os.getenv("OPENROUTESERVICE_GEOCODING_BASE_URL", "https://api.heigit.org/pelias/v1").rstrip("/")
 OPENROUTESERVICE_TIMEOUT = float(os.getenv("OPENROUTESERVICE_TIMEOUT", "15"))
+OPEN_METEO_BASE_URL = os.getenv("OPEN_METEO_BASE_URL", "https://api.open-meteo.com/v1/forecast")
+OPEN_METEO_TIMEOUT = float(os.getenv("OPEN_METEO_TIMEOUT", "15"))
+OPEN_METEO_CACHE_SECONDS = int(os.getenv("OPEN_METEO_CACHE_SECONDS", "1800"))
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

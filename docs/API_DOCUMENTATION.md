@@ -41,4 +41,8 @@ The response contains only unique routes returned by the provider. Route geometr
 
 The backend checkpoint generator currently runs as an internal service rather than a standalone public endpoint. It takes a normalized route, timezone-aware departure timestamp, and supported sampling interval (10, 25, or 50 miles), and returns checkpoints with IDs, coordinates, cumulative distance, and ETA. The trip analysis endpoint will compose this service with the weather and risk results in a later phase.
 
+Hourly weather forecasts are also an internal service at this phase. Open-Meteo supplies wind speed at 10 m, preceding-hour precipitation, and snowfall. The service normalizes values to mph and inches/hour and attaches the closest hourly row within 30 minutes of checkpoint ETA. Forecast times outside Open-Meteo coverage or missing required measurements are labeled unavailable/incomplete.
+
+The requested variables and units follow the [Open-Meteo Forecast API documentation](https://open-meteo.com/en/docs): hourly wind speed supports mph, precipitation/snowfall support inch units, and the general forecast endpoint supports up to 16 forecast days.
+
 Provider endpoint paths and hosted restrictions were checked against the [HeiGIT migration announcement](https://ask.openrouteservice.org/t/deprecating-api-openrouteservice-org-in-favour-of-api-heigit-org/7912), the [Directions API reference](https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/), and [hosted API restrictions](https://giscience.github.io/openrouteservice/hosted-api-restrictions).

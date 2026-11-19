@@ -25,6 +25,6 @@ cp .env.example .env
 python manage.py runserver
 ```
 
-Health endpoint: `http://localhost:8000/api/health/`. Add an OpenRouteService/HeiGIT API key to `backend/.env` before using routing/geocoding. Configure `OPENROUTESERVICE_BASE_URL` and `OPENROUTESERVICE_GEOCODING_BASE_URL` there only if you use a different compatible provider host. Open-Meteo access is public and needs no key for this workflow.
+Health endpoint: `http://localhost:8000/api/health/`. Add an OpenRouteService/HeiGIT API key to `backend/.env` before using routing/geocoding. Configure `OPENROUTESERVICE_BASE_URL` and `OPENROUTESERVICE_GEOCODING_BASE_URL` there only if you use a different compatible provider host. Open-Meteo access is public and needs no key for this workflow. `OPEN_METEO_TIMEOUT` and `OPEN_METEO_CACHE_SECONDS` optionally control forecast request timeouts and normalized forecast caching.
 
 Run backend checks with `python manage.py check` and backend tests with `python -m pytest` from `backend/`.
