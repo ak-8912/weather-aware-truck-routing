@@ -111,6 +111,15 @@ class OpenMeteoTests(SimpleTestCase):
         self.assertIsNone(rows[1]["snowfall_inches_per_hour"])
         self.assertEqual(rows[0]["timestamp"], datetime(2026, 11, 20, 8, tzinfo=timezone.utc))
 
+    def test_accepts_open_meteos_returned_miles_per_hour_unit_symbol(self):
+        payload = forecast_payload(wind=(3.3, 3.7))
+        payload["hourly_units"]["wind_speed_10m"] = "mp/h"
+
+        rows = normalize_hourly_forecast(payload)
+
+        self.assertEqual(rows[0]["wind_speed_mph"], 3.3)
+        self.assertEqual(rows[1]["wind_speed_mph"], 3.7)
+
     def test_missing_variable_is_retained_as_missing_not_zero(self):
         payload = forecast_payload()
         del payload["hourly"]["snowfall"]

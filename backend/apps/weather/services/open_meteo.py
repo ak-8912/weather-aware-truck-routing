@@ -159,7 +159,7 @@ def _normalize_value(variable: str, value: Any, unit: str) -> float | None:
 
     normalized_unit = unit.strip().casefold().replace(" ", "")
     if variable == "wind_speed_10m":
-        if normalized_unit in {"mph", "mi/h"}:
+        if normalized_unit in {"mph", "mi/h", "mp/h"}:
             return number
         if normalized_unit in {"km/h", "kmh"}:
             return number * WIND_KMH_TO_MPH
