@@ -9,3 +9,4 @@ backend/**/__pycache__/
 backend/*.sqlite3
 backend/staticfiles/
 .DS_Store
+.neon

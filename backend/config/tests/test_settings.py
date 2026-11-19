@@ -38,3 +38,18 @@ class DatabaseSettingsTests(TestCase):
     def test_production_requires_explicit_database(self):
         with self.assertRaises(ImproperlyConfigured):
             database_config()
+
+    @patch("config.settings.DEBUG", False)
+    @patch.dict("os.environ", {"DATABASE_URL": "postgresql://driver:secret@ep-example-pooler.us-east-2.aws.neon.tech/routing", "DATABASE_SSLMODE": "require"}, clear=True)
+    def test_neon_pooled_url_uses_transaction_pooler_safe_settings(self):
+        self.assertEqual(database_config(), {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "routing",
+            "USER": "driver",
+            "PASSWORD": "secret",
+            "HOST": "ep-example-pooler.us-east-2.aws.neon.tech",
+            "PORT": "5432",
+            "CONN_MAX_AGE": 0,
+            "DISABLE_SERVER_SIDE_CURSORS": True,
+            "OPTIONS": {"sslmode": "require"},
+        })

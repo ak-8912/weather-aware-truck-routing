@@ -6,7 +6,8 @@ from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+for env_file in (BASE_DIR / ".env.local", BASE_DIR / ".env"):
+    load_dotenv(env_file)
 
 
 def env_bool(name: str, default: bool) -> bool:
@@ -14,6 +15,14 @@ def env_bool(name: str, default: bool) -> bool:
     if value is None:
         return default
     return value.strip().casefold() in {"1", "true", "yes", "on"}
+
+
+def postgres_connection_settings(host: str) -> dict:
+    pooled = env_bool("DATABASE_POOLED", "-pooler." in host)
+    settings = {"CONN_MAX_AGE": int(os.getenv("DATABASE_CONN_MAX_AGE", "0" if pooled else "60"))}
+    if pooled:
+        settings["DISABLE_SERVER_SIDE_CURSORS"] = True
+    return settings
 
 
 DEBUG = env_bool("DJANGO_DEBUG", True)
@@ -62,7 +71,7 @@ def database_config() -> dict:
             "PASSWORD": password,
             "HOST": host,
             "PORT": os.getenv("DJANGO_DB_PORT", "5432"),
-            "CONN_MAX_AGE": int(os.getenv("DATABASE_CONN_MAX_AGE", "60")),
+            **postgres_connection_settings(host),
             "OPTIONS": options,
         }
     if database_engine:
@@ -89,7 +98,7 @@ def database_config() -> dict:
             "PASSWORD": unquote(parsed.password or ""),
             "HOST": parsed.hostname,
             "PORT": parsed.port or "5432",
-            "CONN_MAX_AGE": int(os.getenv("DATABASE_CONN_MAX_AGE", "60")),
+            **postgres_connection_settings(parsed.hostname),
             "OPTIONS": options,
         }
     if parsed.scheme == "sqlite":
@@ -166,3 +175,11 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "json"}},
     "root": {"handlers": ["console"], "level": os.getenv("LOG_LEVEL", "INFO")},
 }
+
+SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-local-development-key")
+
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS", "localhost,127.0.0.1"
+).split(",")
