@@ -26,3 +26,5 @@ python manage.py runserver
 ```
 
 Health endpoint: `http://localhost:8000/api/health/`. Add an OpenRouteService API key to `backend/.env` before routing/geocoding are implemented. Open-Meteo access is public and needs no key for this workflow.
+
+Run backend checks with `python manage.py check` and backend tests with `python -m pytest` from `backend/`.
