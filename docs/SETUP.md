@@ -48,9 +48,9 @@ python manage.py collectstatic --noinput
 gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 60
 ```
 
-Set `DJANGO_DEBUG=False`, a unique `DJANGO_SECRET_KEY`, explicit `DJANGO_ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` with the HTTPS frontend origin, PostgreSQL settings, and `OPENROUTESERVICE_API_KEY` in the host's secret/environment manager. Production mode trusts the forwarded HTTPS scheme and enforces secure cookies and HTTPS redirects. WhiteNoise serves collected static files using compressed manifest storage; it does not provide persistent storage for user uploads.
+Set `DJANGO_DEBUG=False`, a unique `DJANGO_SECRET_KEY`, explicit `DJANGO_ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` with the HTTPS frontend origin, PostgreSQL settings, and `OPENROUTESERVICE_API_KEY` in the host's secret/environment manager. `CORS_ALLOWED_ORIGINS` must be configured before the first deploy because Django validates it during `collectstatic` too. Use the exact origin only (scheme and hostname, no path or trailing slash), for example `https://your-project.vercel.app`; do not leave the local `http://localhost:5173` example in the production service. Production mode trusts the forwarded HTTPS scheme and enforces secure cookies and HTTPS redirects. WhiteNoise serves collected static files using compressed manifest storage; it does not provide persistent storage for user uploads.
 
-For Render, set the service root directory to `backend`, the build command to `./build.sh`, and the start command to `gunicorn config.wsgi:application`. The executable `backend/build.sh` installs requirements, collects static files, then applies migrations.
+For Render, set the service root directory to `backend`, the build command to `./build.sh`, and the start command to `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 60`. Binding to `0.0.0.0:$PORT` lets Render route traffic to Gunicorn. The executable `backend/build.sh` installs requirements, collects static files, then applies migrations.
 
 Build the frontend with the browser-reachable API URL present at build time:
 
