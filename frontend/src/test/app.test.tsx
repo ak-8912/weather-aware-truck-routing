@@ -41,7 +41,11 @@ describe('trip planning and visualization controls', () => {
     const user = userEvent.setup()
     const fetchMock = backendFetch()
     vi.stubGlobal('fetch', fetchMock)
-    renderApp()
+    const { container } = renderApp()
+    expect(screen.getByRole('link', { name: 'Weather aware truck routing home' })).toHaveTextContent('WATR')
+    expect(container.querySelector('.site-footer > span:first-child')).toHaveTextContent('Weather aware truck routing')
+    expect(screen.queryByText('Plan a trip')).not.toBeInTheDocument()
+    expect(screen.queryByRole('navigation', { name: 'Main navigation' })).not.toBeInTheDocument()
 
     await user.type(screen.getAllByPlaceholderText('City, state or address')[0], 'Portland')
     await user.click(await screen.findByRole('option', { name: /Portland, Oregon/i }))
@@ -56,6 +60,9 @@ describe('trip planning and visualization controls', () => {
     await user.click(screen.getByRole('button', { name: /analyze routes/i }))
 
     expect(await screen.findByText('Compare routes')).toBeInTheDocument()
+    expect(container.querySelector('.analysis-workspace')).toBeInTheDocument()
+    expect(container.querySelector('.analysis-controls')).toContainElement(screen.getByRole('slider', { name: /forecast horizon/i }))
+    expect(container.querySelector('.analysis-workspace > .visual-section')).toBeInTheDocument()
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/trips/analyze/'))).toBe(true)
     const analysisCall = fetchMock.mock.calls.find(([url]) => String(url).includes('/trips/analyze/'))
     expect(JSON.parse(String(analysisCall?.[1]?.body))).toMatchObject({ load_weight: 40000, sampling_interval: 10 })

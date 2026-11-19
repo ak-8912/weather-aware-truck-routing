@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { ArrowDown, ArrowUp, CalendarClock, Scale, Route, ArrowRight } from 'lucide-react'
+import { ArrowUp, CalendarClock, Scale, ArrowRight } from 'lucide-react'
 import type { Location } from '../lib/api'
 import LocationField from './LocationField'
 
@@ -30,9 +30,7 @@ export default function TripForm({ onSubmit, busy }: Props) {
     onSubmit({ origin, destination, departure_datetime: new Date(departure).toISOString(), load_weight: pounds, sampling_interval: interval })
   }
   return <form className="trip-form" onSubmit={submit}>
-    <div className="form-section-title"><span className="section-icon"><Route size={17} /></span><div><strong>Plan a trip</strong><small>Get route specific weather risk before you roll.</small></div></div>
     <div className="location-stack"><LocationField label="Origin" value={origin} onChange={setOrigin} placeholder="City, state or address" />
-      <div className="location-connector"><span /><button type="button" title="Swap origin and destination" onClick={() => { setOrigin(destination); setDestination(origin) }}><ArrowDown size={14} /></button></div>
       <LocationField label="Destination" value={destination} onChange={setDestination} placeholder="Where are you headed?" />
     </div>
     <div className="form-grid">
