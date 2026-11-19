@@ -25,6 +25,14 @@ class AllowedHostSettingsTests(TestCase):
         with patch.dict("os.environ", {"DJANGO_ALLOWED_HOSTS": "localhost,127.0.0.1", "RENDER_EXTERNAL_HOSTNAME": ""}, clear=True):
             self.assertEqual(configured_allowed_hosts(debug=True), ["localhost", "127.0.0.1"])
 
+    def test_standard_allowed_hosts_environment_name_is_supported(self):
+        with patch.dict("os.environ", {"ALLOWED_HOSTS": "api.example.com", "RENDER_EXTERNAL_HOSTNAME": ""}, clear=True):
+            self.assertEqual(configured_allowed_hosts(debug=False), ["api.example.com"])
+
+    def test_allow_hosts_environment_alias_is_supported(self):
+        with patch.dict("os.environ", {"ALLOW_HOSTS": "api.example.com", "RENDER_EXTERNAL_HOSTNAME": ""}, clear=True):
+            self.assertEqual(configured_allowed_hosts(debug=False), ["api.example.com"])
+
 
 class DatabaseSettingsTests(TestCase):
     @patch("config.settings.DEBUG", False)

@@ -36,7 +36,9 @@ if not DEBUG and (not SECRET_KEY or SECRET_KEY.casefold() in {
 
 def configured_allowed_hosts(debug: bool, configured_hosts: str | None = None, render_hostname: str | None = None) -> list[str]:
     if configured_hosts is None:
-        configured_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if debug else "")
+        configured_hosts = next((value for name in (
+            "DJANGO_ALLOWED_HOSTS", "ALLOWED_HOSTS", "ALLOW_HOSTS",
+        ) if (value := os.getenv(name)) and value.strip()), "localhost,127.0.0.1" if debug else "")
     if render_hostname is None:
         render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
 
