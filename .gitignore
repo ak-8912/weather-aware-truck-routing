@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules/
+frontend/dist/
+frontend/.vite/
+backend/.venv/
+backend/**/__pycache__/
+backend/*.sqlite3
+backend/staticfiles/
+.DS_Store
