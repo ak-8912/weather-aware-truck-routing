@@ -45,8 +45,26 @@ Hourly weather forecasts are also an internal service at this phase. Open-Meteo 
 
 The requested variables and units follow the [Open-Meteo Forecast API documentation](https://open-meteo.com/en/docs): hourly wind speed supports mph, precipitation/snowfall support inch units, and the general forecast endpoint supports up to 16 forecast days.
 
+## `POST /api/trips/analyze/`
+
+Composes provider routes, ETA checkpoints, hourly checkpoint weather, risk calculations, risk miles, and the recommendation service for a trip. Request locations must be selected from real geocoding results. Departure time must be timezone aware; supported checkpoint intervals are 10, 25, and 50 miles; load weight is in pounds.
+
+```json
+{
+  "origin": {"name": "New York", "latitude": 40.7128, "longitude": -74.006},
+  "destination": {"name": "Boston", "latitude": 42.3601, "longitude": -71.0589},
+  "departure_datetime": "2026-11-20T08:00:00-05:00",
+  "load_weight": 35000,
+  "sampling_interval": 25
+}
+```
+
+The response contains `trip`, `routes`, `recommended_route_id`, `recommendation_explanation`, and `analysis_metadata`. Every route includes its provider `geometry` (`[longitude, latitude]`), distance/duration, full enriched `checkpoints`, risk miles, weather coverage, safety state, and timezone-aware arrival. Checkpoints include measured wind, precipitation and snowfall values (or `null`), forecast timestamp/status, individual and combined risk classifications, and ETA. No Travel exposure and unavailable weather remain distinct. Recommendation ranking and incompleteness rules are documented in [RISK_CALCULATION.md](RISK_CALCULATION.md).
+
+The endpoint returns structured validation errors for invalid locations, load weights, times, and sampling intervals. Provider configuration, timeout, rate-limit, invalid-response, and no-route failures propagate as API errors and are not replaced with fabricated analysis data.
+
 ## Risk and recommendation services
 
-Phase 6 implements checkpoint and route risk calculations and route recommendation as backend services, documented in [RISK_CALCULATION.md](RISK_CALCULATION.md). These calculations are not yet exposed through a public trip-analysis endpoint; the route, checkpoint, weather, risk, and recommendation services will be composed into the trip workflow in a later integration phase.
+Checkpoint and route risk calculations and route recommendation are implemented as backend services, documented in [RISK_CALCULATION.md](RISK_CALCULATION.md), and composed by `POST /api/trips/analyze/`.
 
 Provider endpoint paths and hosted restrictions were checked against the [HeiGIT migration announcement](https://ask.openrouteservice.org/t/deprecating-api-openrouteservice-org-in-favour-of-api-heigit-org/7912), the [Directions API reference](https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/), and [hosted API restrictions](https://giscience.github.io/openrouteservice/hosted-api-restrictions).

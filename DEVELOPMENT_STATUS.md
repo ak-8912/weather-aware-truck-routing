@@ -7,69 +7,58 @@
 - Phase 3: routing and geocoding integrations.
 - Phase 4: checkpoint generation.
 - Phase 5: weather integration.
-- Phase 6: risk engine.
+- Phase 6: risk engine and recommendation services.
+- Phase 7: React trip planning frontend and API connection.
+- Phase 8: Leaflet route map, checkpoint weather visualization, route comparison, risk breakdown, and forecast timeline.
 
 ## Current phase
 
-- Phase 7: frontend foundation.
+- Phases 1–8 are implemented. Phase 9: full integration and QA is next.
 
 ## Implemented features
 
-- React + TypeScript + Vite frontend scaffold with a landing screen, favicon, Tailwind CSS v4, and shadcn/ui configuration.
-- Django project and four app packages with DRF, CORS, dotenv, SQLite, JSON logging, a validated health endpoint, and a common DRF error envelope.
-- OpenRouteService provider abstraction and hosted integration for HGV directions and Pelias geocoding; route response normalization, geometry deduplication, geocoding cache, input/output serializers, and provider error mapping.
-- Route alternative and geocoding API endpoints with explicit notices when fewer than three real alternatives are available.
-- Checkpoint generation along route geometry at 10-, 25-, and 50-mile intervals, with interpolated coordinates, cumulative distances, endpoint handling, route-proportional ETAs, and timezone-aware departure validation.
-- Open-Meteo hourly forecast provider with batched multi-location requests, 30-minute cache, timezone-safe UTC timestamps, internal mph/inches normalization, and explicit unavailable/incomplete checkpoint weather states.
-- Nearest-hour weather matching within 30 minutes of each checkpoint ETA; missing forecasts or measurements remain unavailable rather than becoming zero/safe values.
-- Exact wind, rain, and snow thresholds; load-specific wind adjustments; combined checkpoint risk; and individual component classifications.
-- Route risk miles, unavailable-weather miles, coverage, distance-weighted average risk, maximum risk, No Travel exposure, and route safety state.
-- Lexicographic recommendation ordering with the required No Travel safety gate, all-routes-unsafe handling, and incomplete-coverage explanations.
-- Environment examples, pytest configuration, initial documentation, and the planned source directory structure.
+- Responsive React + TypeScript trip planning dashboard with location autocomplete from the Django geocoding API, timezone-aware departure input, load weight, and 10/25/50 mile sampling choices.
+- Frontend submits trip analysis requests to `POST /api/trips/analyze/`; provider failures are surfaced without substituting fake routes or weather.
+- Django analysis endpoint composes real ORS route alternatives, checkpoint generation, Open-Meteo checkpoint weather, risk calculations, route risk miles, and the backend recommendation service.
+- Route comparison includes distance, provider travel time, arrival time, average risk, risk-mile breakdown, maximum risk, weather coverage, safe-to-travel state, and recommendation explanation.
+- Leaflet map renders all returned route geometry, highlights the selected route, fits the viewport, displays selected-route weather checkpoints with detail popups, and includes a risk legend and checkpoint heatmap circles.
+- 0–48 hour timeline filters visible checkpoint layers by elapsed time since departure; it does not fabricate or interpolate hourly weather between sampled checkpoints.
+- Frontend API client supports configurable `VITE_API_BASE_URL`, TanStack Query autocomplete caching, loading states, field validation, API health status, and structured error display.
+- Responsive styling and map attribution; no provider credentials are stored in frontend code.
 
 ## Files created or modified
 
-- Frontend application/config files and npm lockfile under `frontend/`.
-- Django project, app packages, health serializer/view/URL, API exception handler, JSON log formatter, and pytest config under `backend/`.
-- Routing provider/service, route processor, routing/geocoding serializers, views, URLs, and provider/API/processor tests under `backend/apps/routing/`.
-- Route checkpoint generator and checkpoint/ETA boundary tests under `backend/apps/routing/services/` and `backend/apps/routing/tests/`.
-- Open-Meteo provider abstraction, forecast normalization, checkpoint weather matching, and unit/error/coverage tests under `backend/apps/weather/services/` and `backend/apps/weather/tests/`.
-- Risk level constants, checkpoint/load risk calculation, route exposure metrics, route recommendation service, and mandatory threshold/scenario tests under `backend/apps/risk_engine/services/` and `backend/apps/risk_engine/tests/`.
-- Open-Meteo configuration values and timeout/cache settings in `backend/config/settings.py` and `backend/.env.example`.
-- Updated architecture, API, risk calculation, and setup documentation for checkpoints, weather, and recommendation behavior.
-- Updated ORS endpoint configuration and `.env.example`; expanded API, architecture, and setup documentation.
-- Initial docs, root README, `.gitignore`, and this status file.
+- `backend/apps/trips/serializers.py`, `backend/apps/trips/views.py`, and `backend/apps/trips/urls.py`: validated trip-analysis request/response and service composition endpoint.
+- `backend/apps/trips/tests/test_trip_analysis.py`: endpoint composition and input validation coverage.
+- `frontend/src/App.tsx`, `frontend/src/index.css`, `frontend/src/main.tsx`, `frontend/src/vite-env.d.ts`, `frontend/vite.config.ts`, `frontend/package.json`, and `frontend/package-lock.json`.
+- `frontend/src/lib/api.ts`; `frontend/src/components/LocationField.tsx`, `TripForm.tsx`, `RouteMap.tsx`, and `RouteResults.tsx`.
+- `frontend/src/test/`: API client, trip flow, route/slider/heatmap controls, validation, and error-state tests with isolated fixture responses.
+- `README.md`, `docs/SETUP.md`, `docs/ARCHITECTURE.md`, `docs/API_DOCUMENTATION.md`, and this status file.
 
 ## Tests and verification
 
-- `npm install` — passed (141 packages; 0 reported vulnerabilities).
-- `npm run build` — passed (TypeScript check and Vite production build).
-- `python manage.py check` — passed.
-- `python manage.py migrate --noinput` — passed (local SQLite initialized).
-- `python -m pytest` in `backend/` — passed (28 total tests: health/error envelope, routing/geocoding endpoints, ORS request/error handling, route normalization/deduplication, and checkpoint generation/ETA/interpolation).
-- `python manage.py check` — passed after Phase 2 changes.
-- Development server smoke check — frontend and backend both returned HTTP 200.
-- `python manage.py check` — passed after Phase 3 and Phase 4 changes.
-- `python manage.py check` — passed after Phase 5 changes.
-- `python -m pytest` in `backend/` — passed (43 total tests, including batched Open-Meteo requests, caching, measurement conversions, forecast time matching, timezone handling, and incomplete/out-of-coverage weather cases).
-- `python manage.py check` — passed after Phase 6 changes.
-- `python -m pytest` in `backend/` — passed (100 total tests; includes all required wind/rain/snow/load boundaries, risk-mile and average calculations, missing weather, No Travel handling, and lexicographic recommendation scenarios).
-- External API responses are mocked in tests. A live-provider check was not run because no ORS API key is configured.
+- Frontend `npm run test -- --reporter=dot` — passed (6 Vitest tests covering debounced location search/API requests/errors, form validation, provider-backed trip analysis, load and sampling submission, route selection, 0–48 hour slider, heatmap toggle, and provider error display).
+- Frontend `npm run build` — passed (strict TypeScript check and Vite production bundle).
+- Backend `python manage.py check` — passed.
+- Backend `python -m pytest` — passed (102 tests, including the new trip-analysis API tests).
+- Development server smoke check — Vite and Django started; frontend returned HTTP 200 and `/api/health/` returned HTTP 200 with `routing_configured: false`.
+- Browser-based live UI smoke check was unavailable because BrowserOS Neo was not connected in this session; frontend interaction tests mock the Leaflet component, while the production build compiles the actual map code.
+- Live ORS and Open-Meteo trip analysis was not verified; automated tests use controlled provider responses. The ORS key is not configured in the supplied backend environment.
 
-## Known issues
+## Known issues and limitations
 
-- OpenRouteService/HeiGIT API key is not configured; live routing and geocoding verification requires a key in `backend/.env`.
-- Hosted ORS alternative route requests are limited to routes up to 100 km; when that specific limit is returned, the service retries for the provider's primary route only.
-- Open-Meteo's general forecast API returns up to 16 forecast days. Later checkpoint ETAs are explicitly marked unavailable.
-- Live weather API connectivity was not exercised; provider responses were mocked in the automated tests.
-- Risk, route, and weather services are implemented and tested independently; the combined `POST /api/trips/analyze/` workflow is not implemented yet.
-- No Git repository was present in the supplied directory.
+- Live routing/geocoding requires an OpenRouteService/HeiGIT key in `backend/.env`; without it the API returns a clear configuration error.
+- Hosted ORS alternative calculations have a 100 km restriction and can return fewer alternatives; only returned routes are shown.
+- Open-Meteo matching is performed at generated route checkpoints; the 0–48 hour slider filters those checkpoint observations and does not represent a dense hourly corridor forecast.
+- Leaflet map tiles require a network connection to OpenStreetMap tile servers.
+- The current Django CORS allowlist is for local Vite origins; production deployment must configure its actual frontend origin and allowed hosts.
+- The browser runtime could not be visually inspected in this session because BrowserOS Neo was unavailable.
 
 ## Remaining work
 
-- Phases 1–6 are complete.
-- Phase 7 has not started; waiting for the user's instruction to continue.
+- Phase 9: full workflow QA against configured live providers, including weather horizon and all error cases.
+- Phase 10: deployment configuration, production CORS/host settings, and final documentation review.
 
 ## Next recommended action
 
-- Begin Phase 7 after the user asks to continue.
+- Configure an ORS/HeiGIT key, start Django and Vite, and proceed with Phase 9 integration QA.
