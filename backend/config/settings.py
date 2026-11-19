@@ -26,6 +26,9 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "EXCEPTION_HANDLER": "config.exceptions.api_exception_handler",
 }
+OPENROUTESERVICE_BASE_URL = os.getenv("OPENROUTESERVICE_BASE_URL", "https://api.heigit.org/openrouteservice").rstrip("/")
+OPENROUTESERVICE_GEOCODING_BASE_URL = os.getenv("OPENROUTESERVICE_GEOCODING_BASE_URL", "https://api.heigit.org/pelias/v1").rstrip("/")
+OPENROUTESERVICE_TIMEOUT = float(os.getenv("OPENROUTESERVICE_TIMEOUT", "15"))
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
