@@ -7,10 +7,11 @@
 - Phase 3: routing and geocoding integrations.
 - Phase 4: checkpoint generation.
 - Phase 5: weather integration.
+- Phase 6: risk engine.
 
 ## Current phase
 
-- Phase 6: risk engine.
+- Phase 7: frontend foundation.
 
 ## Implemented features
 
@@ -21,6 +22,9 @@
 - Checkpoint generation along route geometry at 10-, 25-, and 50-mile intervals, with interpolated coordinates, cumulative distances, endpoint handling, route-proportional ETAs, and timezone-aware departure validation.
 - Open-Meteo hourly forecast provider with batched multi-location requests, 30-minute cache, timezone-safe UTC timestamps, internal mph/inches normalization, and explicit unavailable/incomplete checkpoint weather states.
 - Nearest-hour weather matching within 30 minutes of each checkpoint ETA; missing forecasts or measurements remain unavailable rather than becoming zero/safe values.
+- Exact wind, rain, and snow thresholds; load-specific wind adjustments; combined checkpoint risk; and individual component classifications.
+- Route risk miles, unavailable-weather miles, coverage, distance-weighted average risk, maximum risk, No Travel exposure, and route safety state.
+- Lexicographic recommendation ordering with the required No Travel safety gate, all-routes-unsafe handling, and incomplete-coverage explanations.
 - Environment examples, pytest configuration, initial documentation, and the planned source directory structure.
 
 ## Files created or modified
@@ -30,8 +34,9 @@
 - Routing provider/service, route processor, routing/geocoding serializers, views, URLs, and provider/API/processor tests under `backend/apps/routing/`.
 - Route checkpoint generator and checkpoint/ETA boundary tests under `backend/apps/routing/services/` and `backend/apps/routing/tests/`.
 - Open-Meteo provider abstraction, forecast normalization, checkpoint weather matching, and unit/error/coverage tests under `backend/apps/weather/services/` and `backend/apps/weather/tests/`.
+- Risk level constants, checkpoint/load risk calculation, route exposure metrics, route recommendation service, and mandatory threshold/scenario tests under `backend/apps/risk_engine/services/` and `backend/apps/risk_engine/tests/`.
 - Open-Meteo configuration values and timeout/cache settings in `backend/config/settings.py` and `backend/.env.example`.
-- Updated architecture, API, risk-input, and setup documentation for checkpoints and weather integration.
+- Updated architecture, API, risk calculation, and setup documentation for checkpoints, weather, and recommendation behavior.
 - Updated ORS endpoint configuration and `.env.example`; expanded API, architecture, and setup documentation.
 - Initial docs, root README, `.gitignore`, and this status file.
 
@@ -47,6 +52,8 @@
 - `python manage.py check` — passed after Phase 3 and Phase 4 changes.
 - `python manage.py check` — passed after Phase 5 changes.
 - `python -m pytest` in `backend/` — passed (43 total tests, including batched Open-Meteo requests, caching, measurement conversions, forecast time matching, timezone handling, and incomplete/out-of-coverage weather cases).
+- `python manage.py check` — passed after Phase 6 changes.
+- `python -m pytest` in `backend/` — passed (100 total tests; includes all required wind/rain/snow/load boundaries, risk-mile and average calculations, missing weather, No Travel handling, and lexicographic recommendation scenarios).
 - External API responses are mocked in tests. A live-provider check was not run because no ORS API key is configured.
 
 ## Known issues
@@ -55,13 +62,14 @@
 - Hosted ORS alternative route requests are limited to routes up to 100 km; when that specific limit is returned, the service retries for the provider's primary route only.
 - Open-Meteo's general forecast API returns up to 16 forecast days. Later checkpoint ETAs are explicitly marked unavailable.
 - Live weather API connectivity was not exercised; provider responses were mocked in the automated tests.
+- Risk, route, and weather services are implemented and tested independently; the combined `POST /api/trips/analyze/` workflow is not implemented yet.
 - No Git repository was present in the supplied directory.
 
 ## Remaining work
 
-- Phases 1–5 are complete.
-- Phase 6 has not started; waiting for the user's instruction to continue.
+- Phases 1–6 are complete.
+- Phase 7 has not started; waiting for the user's instruction to continue.
 
 ## Next recommended action
 
-- Begin Phase 6 after the user asks to continue.
+- Begin Phase 7 after the user asks to continue.

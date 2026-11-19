@@ -45,4 +45,8 @@ Hourly weather forecasts are also an internal service at this phase. Open-Meteo 
 
 The requested variables and units follow the [Open-Meteo Forecast API documentation](https://open-meteo.com/en/docs): hourly wind speed supports mph, precipitation/snowfall support inch units, and the general forecast endpoint supports up to 16 forecast days.
 
+## Risk and recommendation services
+
+Phase 6 implements checkpoint and route risk calculations and route recommendation as backend services, documented in [RISK_CALCULATION.md](RISK_CALCULATION.md). These calculations are not yet exposed through a public trip-analysis endpoint; the route, checkpoint, weather, risk, and recommendation services will be composed into the trip workflow in a later integration phase.
+
 Provider endpoint paths and hosted restrictions were checked against the [HeiGIT migration announcement](https://ask.openrouteservice.org/t/deprecating-api-openrouteservice-org-in-favour-of-api-heigit-org/7912), the [Directions API reference](https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/), and [hosted API restrictions](https://giscience.github.io/openrouteservice/hosted-api-restrictions).

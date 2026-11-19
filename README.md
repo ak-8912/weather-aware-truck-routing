@@ -1,6 +1,6 @@
 # Weather-Aware Truck Routing
 
-Full stack trip planning foundation for assessing weather exposure along road routes. The backend uses OpenRouteService/HeiGIT for routing and geocoding and Open-Meteo for forecasts. It now includes route checkpoint generation and checkpoint-level hourly weather matching; risk calculations and route recommendations are the next backend phase.
+Full stack trip planning foundation for assessing weather exposure along road routes. The backend uses OpenRouteService/HeiGIT for routing and geocoding and Open-Meteo for forecasts. It includes route checkpoint generation, checkpoint-level hourly weather matching, risk calculations, route risk miles, and route recommendations.
 
 ## Development
 
